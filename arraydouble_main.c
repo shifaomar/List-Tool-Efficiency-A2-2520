@@ -73,6 +73,12 @@ int processFasta(char *filename, double *timeTaken, int *arraySize)
 
 	fclose(fp);
 
+	for (int i = 0; i < recordNumber; i++)
+	{
+		free(recordArray[i].description);
+		free(recordArray[i].sequence);
+	}
+
 	// freeing recordArray
 	free(recordArray);
 	printf("........... %d FASTA records", count);
