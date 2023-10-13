@@ -73,6 +73,7 @@ int processFasta(char *filename, double *timeTaken, int *arraySize)
 
 	fclose(fp);
 
+	// freeing memory for descriptions and sequences in recordArray
 	for (int i = 0; i < recordNumber; i++)
 	{
 		free(recordArray[i].description);
