@@ -5,10 +5,7 @@ NAME: Shifa Sheikh
 STUDENT NUMBER: 1241048
 
 Limitations
-the arraydouble_main.c does not print the waste(for now)
-
+memory leaks for arraydouble_main.c
 
 Resources used
 llloadonly_main.c
-
-
