@@ -6,7 +6,7 @@
 
 #include "fasta.h"
 
-int processFasta(char *filename, double *timeTaken)
+int processFasta(char *filename, double *timeTaken, int *arraySize)
 {
 	FILE *fp;
 	FASTArecord fRecord;
@@ -14,7 +14,7 @@ int processFasta(char *filename, double *timeTaken)
 	int eofSeen = 0;
 	clock_t startTime, endTime;
 	FASTArecord *recordArray = NULL;
-	int arraySize = 1000; // Initial array size
+	// int arraySize = 1000; // Initial array size
 
 	fp = fopen(filename, "r");
 	if (fp == NULL)
@@ -26,7 +26,9 @@ int processFasta(char *filename, double *timeTaken)
 	/** record the time now, before we do the work */
 	startTime = clock();
 	int count = 0;
-	recordArray = (FASTArecord *)malloc(arraySize * sizeof(FASTArecord));
+
+	/*allocating memory for an array of FASTA records*/
+	recordArray = (FASTArecord *)malloc(*arraySize * sizeof(FASTArecord));
 
 	do
 	{
@@ -47,11 +49,11 @@ int processFasta(char *filename, double *timeTaken)
 		}
 		else if (status > 0)
 		{
-			if (recordNumber == arraySize)
+			if (recordNumber == *arraySize)
 			{
-				// doubling array size
-				arraySize *= 2;
-				recordArray = (FASTArecord *)realloc(recordArray, arraySize * sizeof(FASTArecord));
+				// doubling array size and reallocating memory
+				*arraySize *= 2;
+				recordArray = (FASTArecord *)realloc(recordArray, *arraySize * sizeof(FASTArecord));
 			}
 			// Copying into arrray
 			recordArray[recordNumber] = fRecord;
@@ -73,23 +75,32 @@ int processFasta(char *filename, double *timeTaken)
 
 	// freeing recordArray
 	free(recordArray);
-	printf("........... %d FASTA records\n", count);
+	printf("........... %d FASTA records", count);
 	return recordNumber;
 }
 
 int processFastaRepeatedly(char *filename, long repeatsRequested)
 {
-	double timeThisIterationInSeconds;
+	// double timeThisIterationInSeconds;
 	double totalTimeInSeconds = 0;
 	int minutesPortion;
 	int status;
 	long i;
+	int arraySize = 1000;
 
 	for (i = 0; i < repeatsRequested; i++)
 	{
-		status = processFasta(filename, &timeThisIterationInSeconds);
+		double timeThisIterationInSeconds;
+		status = processFasta(filename, &timeThisIterationInSeconds, &arraySize);
 		if (status < 0)
+		{
 			return -1;
+		}
+		// calculating memory waste
+		int memoryWaste = ((arraySize - status) * 100) / arraySize;
+
+		printf(" -- %d allocated (%d%% waste)\n", arraySize, memoryWaste);
+
 		totalTimeInSeconds += timeThisIterationInSeconds;
 	}
 
@@ -152,6 +163,8 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Error: Processing '%s' failed -- exiting\n", argv[i]);
 				return 1;
 			}
+			/*printf("%d records processed from '%s'\n",
+					recordsProcessed, argv[i]);*/
 		}
 	}
 

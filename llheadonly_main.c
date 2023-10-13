@@ -50,6 +50,7 @@ int processFasta(char *filename, double *timeTaken)
 			recordNumber++;
 			count++;
 
+			// creating linked list
 			LLvNode *newNode = llNewNode(fRecord.description, &fRecord);
 			head = llAppend(head, newNode);
 			fastaClearRecord(&fRecord);
